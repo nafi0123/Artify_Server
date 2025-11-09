@@ -23,7 +23,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect client
-    await client.connect();
+    // await client.connect();
     console.log("MongoDB connected successfully");
 
     const db = client.db("artify_db");
