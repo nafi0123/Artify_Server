@@ -41,6 +41,19 @@ async function run() {
       }
     });
 
+
+
+    app.get("/artworks-recent", async (req, res) => {
+      try {
+        const artwork = await productsCollection
+          .find({ visibility: "Public" })
+          .sort({ date: -1 })
+          .limit(6).toArray();
+        res.json(artwork); 
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
+    });
   } catch (err) {
     console.log(err);
   }
