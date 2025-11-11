@@ -30,23 +30,6 @@ async function run() {
     const productsCollection = db.collection("artwork");
     const favoritesCollection = db.collection("favorites");
 
-    //     app.post("/favorites", async (req, res) => {
-    //   const favoriteData = req.body; // e.g. { artworkId, title, imageUrl }
-    //   const query = { artworkId: favoriteData.artworkId };
-
-    //   try {
-    //     const existing = await favoritesCollection.findOne(query);
-    //     if (existing) {
-    //       return res.status(200).send({ message: "Already favorited" });
-    //     }
-
-    //     const result = await favoritesCollection.insertOne(favoriteData);
-    //     res.send(result);
-    //   } catch (err) {
-    //     res.status(500).send({ error: err.message });
-    //   }
-    // });
-
     app.post("/favorites", async (req, res) => {
       const favoriteData = req.body;
       const query = { artworkId: favoriteData.artworkId };
@@ -82,8 +65,6 @@ async function run() {
       }
     });
 
-    // DELETE favorite by artworkId
-    // DELETE favorite by _id
     app.delete("/my-favorites/:id", async (req, res) => {
       const id = req.params.id;
 
@@ -107,32 +88,6 @@ async function run() {
       }
     });
 
-    // DELETE favorite by artworkId
-    // app.delete("/favorites/:artworkId", async (req, res) => {
-    //   const artworkId = req.params.artworkId; // URL theke artworkId neya
-    //   try {
-    //     // Delete favorite
-    //     const result = await favoritesCollection.deleteOne({ artworkId });
-
-    //     if (result.deletedCount === 0) {
-    //       // jodi kono match na hoy
-    //       return res
-    //         .status(404)
-    //         .send({ message: "Artwork not found in favorites" });
-    //     }
-
-    //     // Optionally, updated favorites list pathaite paro
-    //     const updatedFavorites = await favoritesCollection.find({}).toArray();
-
-    //     res.send({
-    //       message: "Deleted successfully",
-    //       favorites: updatedFavorites,
-    //     });
-    //   } catch (err) {
-    //     res.status(500).send({ error: err.message });
-    //   }
-    // });
-
     // GET artwork route
     app.get("/artwork", async (req, res) => {
       try {
@@ -140,6 +95,21 @@ async function run() {
         const query = email ? { userEmail: email } : {};
         const result = await productsCollection.find(query).toArray();
         res.send(result);
+      } catch (err) {
+        res.status(500).send({ error: err.message });
+      }
+    });
+ 
+
+    app.post("/artwork", async (req, res) => {
+      try {
+        const artwork = req.body;
+        const result = await productsCollection.insertOne(artwork);
+        res.send({
+          message: "Artwork added successfully",
+          insertedId: result.insertedId,
+          data: artwork,
+        });
       } catch (err) {
         res.status(500).send({ error: err.message });
       }
