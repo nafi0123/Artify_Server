@@ -63,8 +63,6 @@ async function run() {
       }
     });
 
-    
-
     app.get("/favorites", async (req, res) => {
       try {
         const favorites = await favoritesCollection.find().toArray();
@@ -83,6 +81,57 @@ async function run() {
         res.status(500).send({ error: err.message });
       }
     });
+
+    // DELETE favorite by artworkId
+    // DELETE favorite by _id
+    app.delete("/my-favorites/:id", async (req, res) => {
+      const id = req.params.id;
+
+      try {
+        const result = await favoritesCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
+
+        if (result.deletedCount === 0) {
+          return res
+            .status(404)
+            .send({ message: "Artwork not found in favorites" });
+        }
+
+        // Updated favorites list pathaite
+        const updatedFavorites = await favoritesCollection.find({}).toArray();
+
+        res.send(updatedFavorites);
+      } catch (err) {
+        res.status(500).send({ error: err.message });
+      }
+    });
+
+    // DELETE favorite by artworkId
+    // app.delete("/favorites/:artworkId", async (req, res) => {
+    //   const artworkId = req.params.artworkId; // URL theke artworkId neya
+    //   try {
+    //     // Delete favorite
+    //     const result = await favoritesCollection.deleteOne({ artworkId });
+
+    //     if (result.deletedCount === 0) {
+    //       // jodi kono match na hoy
+    //       return res
+    //         .status(404)
+    //         .send({ message: "Artwork not found in favorites" });
+    //     }
+
+    //     // Optionally, updated favorites list pathaite paro
+    //     const updatedFavorites = await favoritesCollection.find({}).toArray();
+
+    //     res.send({
+    //       message: "Deleted successfully",
+    //       favorites: updatedFavorites,
+    //     });
+    //   } catch (err) {
+    //     res.status(500).send({ error: err.message });
+    //   }
+    // });
 
     // GET artwork route
     app.get("/artwork", async (req, res) => {
