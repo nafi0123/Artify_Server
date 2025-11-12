@@ -89,6 +89,26 @@ async function run() {
     });
 
     // GET artwork route
+
+    app.delete("/artwork/:id", async (req, res) => {
+      const id = req.params.id;
+      try {
+        const result = await productsCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
+        if (result.deletedCount === 0) {
+          return res.status(404).send({ message: "Artwork not found" });
+        }
+        res.send({ message: "Artwork deleted successfully" });
+      } catch (err) {
+        res.status(500).send({ error: err.message });
+      }
+    });
+
+
+
+    
+
     app.get("/artwork", async (req, res) => {
       try {
         const email = req.query.email;
@@ -99,7 +119,43 @@ async function run() {
         res.status(500).send({ error: err.message });
       }
     });
- 
+
+    app.patch("/artwork/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateArt = req.body;
+
+      try {
+        const query = { _id: new ObjectId(id) };
+        const existingArt = await productsCollection.findOne(query);
+
+        if (!existingArt) {
+          return res.status(404).send({ message: "Artwork not found" });
+        }
+
+        const updatedData = {
+          ...existingArt,
+          ...updateArt,
+          date: new Date(),
+        };
+
+        const update = { $set: updatedData };
+
+        const result = await productsCollection.updateOne(query, update);
+
+        if (result.modifiedCount === 0) {
+          return res.status(200).send({ message: "No changes made" });
+        }
+
+        const updatedDoc = await productsCollection.findOne(query);
+        res.send({
+          message: "Artwork updated successfully",
+          data: updatedDoc,
+        });
+      } catch (err) {
+        console.error("Error updating artwork:", err);
+        res.status(500).send({ error: err.message });
+      }
+    });
 
     app.post("/artwork", async (req, res) => {
       try {
@@ -125,7 +181,6 @@ async function run() {
         if (!artwork)
           return res.status(404).send({ message: "Artwork not found" });
 
-        // Determine new like count for toggle
         const isLiked = artwork.isLiked || false;
 
         const updatedArtwork = await productsCollection.findOneAndUpdate(
