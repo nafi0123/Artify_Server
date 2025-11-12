@@ -215,12 +215,38 @@ async function run() {
       }
     });
 
+    //     app.get("/explore-artworks", async (req, res) => {
+    //   try {
+    //     const { search } = req.query; // get search term from query string
+    //     let query = { visibility: "Public" }; // base query
+
+    //     if (search) {
+    //       query.$or = [
+    //         { title: { $regex: search, $options: "i" } },        // case-insensitive match for title
+    //         { "artistInfo.name": { $regex: search, $options: "i" } } // case-insensitive match for artist name
+    //       ];
+    //     }
+
+    //     const artworks = await productsCollection.find(query).toArray();
+    //     res.json(artworks);
+    //   } catch (err) {
+    //     res.status(500).json({ error: err.message });
+    //   }
+    // });
+
     app.get("/explore-artworks", async (req, res) => {
       try {
-        const artwork = await productsCollection
-          .find({ visibility: "Public" })
-          .toArray();
-        res.json(artwork);
+        const { search } = req.query;
+        let query = { visibility: "Public" };
+
+        if (search) {
+          query.$or = [
+            { title: { $regex: search, $options: "i" } },
+            { "artistInfo.name": { $regex: search, $options: "i" } },
+          ];
+        }
+        const artworks = await productsCollection.find(query).toArray();
+        res.json(artworks);
       } catch (err) {
         res.status(500).json({ error: err.message });
       }
