@@ -105,10 +105,6 @@ async function run() {
       }
     });
 
-
-
-    
-
     app.get("/artwork", async (req, res) => {
       try {
         const email = req.query.email;
@@ -212,6 +208,17 @@ async function run() {
           .find({ visibility: "Public" })
           .sort({ date: -1 })
           .limit(6)
+          .toArray();
+        res.json(artwork);
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
+    });
+
+    app.get("/explore-artworks", async (req, res) => {
+      try {
+        const artwork = await productsCollection
+          .find({ visibility: "Public" })
           .toArray();
         res.json(artwork);
       } catch (err) {
