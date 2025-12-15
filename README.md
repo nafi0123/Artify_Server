@@ -6,7 +6,7 @@ This is the backend server for **Artify**, an online art-sharing platform where 
 
 ## 🌐 Live Client Site
 
-[Artify Client Live](https://fir-1d10b.web.app/)
+[Artify Client Live](https://artify-smoky-nu.vercel.app/)
 
 ---
 
