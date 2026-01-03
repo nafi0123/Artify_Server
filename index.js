@@ -207,7 +207,7 @@ async function run() {
         const artwork = await productsCollection
           .find({ visibility: "Public" })
           .sort({ date: -1 })
-          .limit(6)
+          .limit(8)
           .toArray();
         res.json(artwork);
       } catch (err) {
@@ -215,24 +215,27 @@ async function run() {
       }
     });
 
- 
-
+    // Backend Route - /explore-artworks
     app.get("/explore-artworks", async (req, res) => {
       try {
-        const { search = "", category = "All" } = req.query;
+        const {
+          search = "",
+          category = "All",
+          sort = "",
+          page = 1,
+          limit = 8,
+        } = req.query;
 
-        
         let query = { visibility: "Public" };
 
+        // Category filter
         if (category && category !== "All" && category !== "Others") {
-        
           query.category = category;
         } else if (category === "Others") {
-          
           query.category = { $nin: ["Painting", "Photography", "Digital Art"] };
         }
 
-       
+        // Search filter
         if (search) {
           query.$or = [
             { title: { $regex: search, $options: "i" } },
@@ -240,19 +243,45 @@ async function run() {
           ];
         }
 
-        const artworks = await productsCollection.find(query).toArray();
-        res.json(artworks);
+        // Sorting
+        let sortOption = {};
+        if (sort === "priceAsc") sortOption.price = 1;
+        else if (sort === "priceDesc") sortOption.price = -1;
+
+        // Pagination
+        const pageNum = parseInt(page) || 1;
+        const limitNum = parseInt(limit) || 8;
+        const skip = (pageNum - 1) * limitNum;
+
+        const totalCount = await productsCollection.countDocuments(query);
+        const totalPages = Math.ceil(totalCount / limitNum);
+
+        const artworks = await productsCollection
+          .find(query)
+          .sort(sortOption)
+          .skip(skip)
+          .limit(limitNum)
+          .toArray();
+
+        res.json({ artworks, totalPages });
       } catch (err) {
         res.status(500).json({ error: err.message });
       }
     });
 
+    app.get("/artworks-stats", async (req, res) => {
+      try {
+        const artwork = await productsCollection.find().toArray();
+        res.json(artwork);
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
+    });
+
+    
 
 
-
-
-
-
+    
   } catch (err) {
     console.log(err);
   }
