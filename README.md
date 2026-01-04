@@ -26,7 +26,6 @@ This is the backend server for **Artify**, an online art-sharing platform where 
 
 - **Node.js & Express.js** – Server and REST API framework  
 - **MongoDB** – NoSQL database for storing users and artworks  
-- **Mongoose** – ODM for MongoDB data modeling  
 - **Cors** – Cross-Origin Resource Sharing  
 - **Dotenv** – Environment variable management  
 - **Nodemon** – Development server auto-reload  
